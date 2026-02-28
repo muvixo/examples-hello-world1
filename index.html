@@ -1,80 +1,179 @@
-<!DOCTYPE html>
-<html lang="en">
+// ============================================
+// V2Ray Config Generator for Deno Deploy
+// نسخه نهایی و تضمینی
+// ============================================
 
+const UUID = "d342d11e-d424-4583-b36e-524ab1f0afa4";
+
+Deno.serve((req: Request) => {
+  const url = new URL(req.url);
+  const host = req.headers.get("host") || "localhost";
+  
+  // صفحه اصلی
+  if (url.pathname === "/") {
+    return new Response(getHtml(host, UUID), {
+      headers: { "content-type": "text/html; charset=utf-8" }
+    });
+  }
+  
+  // فایل کانفیگ
+  if (url.pathname === "/vless.txt" || url.pathname === "/config") {
+    const config = `vless://${UUID}@${host}:443?encryption=none&security=tls&sni=${host}&type=ws&host=${host}&path=%2Fvless%3Fed%3D2048#Deno-${host.split('.')[0]}`;
+    return new Response(config, {
+      headers: { 
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-cache"
+      }
+    });
+  }
+  
+  // وضعیت JSON
+  if (url.pathname === "/status") {
+    return new Response(JSON.stringify({
+      status: "online",
+      uuid: UUID,
+      host: host,
+      timestamp: new Date().toISOString()
+    }), {
+      headers: { "content-type": "application/json" }
+    });
+  }
+  
+  // 404
+  return new Response("404 - Not Found", { status: 404 });
+});
+
+function getHtml(host: string, uuid: string): string {
+  return `<!DOCTYPE html>
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello, Deno</title>
-  <link rel="preload" href="https://demo-styles.deno.deno.net/fonts/Moranga-Regular.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="https://demo-styles.deno.deno.net/fonts/Moranga-Medium.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="https://demo-styles.deno.deno.net/fonts/Recursive_Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="https://demo-styles.deno.deno.net/styles.css">
+  <title>V2Ray Config Generator</title>
   <style>
-    img {
-      display: inline-block;
-      vertical-align: middle;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Tahoma', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      color: white;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .status {
+      background: #4CAF50;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 20px 0;
+      color: white;
+      font-weight: bold;
+    }
+    .config-box {
+      background: #1a1a1a;
+      color: #00ff00;
+      padding: 20px;
+      border-radius: 10px;
+      direction: ltr;
+      word-break: break-all;
+      margin: 20px 0;
+      border: 2px solid #4CAF50;
+      font-family: monospace;
+    }
+    .btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      transition: all 0.3s;
+    }
+    .btn:hover { transform: scale(1.05); }
+    .btn-blue { background: #2196F3; }
+    .info {
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      color: white;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 20px; }
+      h1 { font-size: 2rem; }
     }
   </style>
 </head>
-
 <body>
-    <main>
-      <section>
-        <a href="https://deno.com/deploy">
-        </a>
-      <h1>
-        <p>
-          Hello, Deno!
-        </p>
-      </h1>
-      <p>
-        This little example is being served by <a href="https://deno.com/">Deno</a>.
-        You can run it locally or in porduction on <a href="https://deno.com/deploy">Deno Deploy</a> or other hosting platforms.
-      </p>
-      <ul>
-        <li>Run it locally with<code>deno task dev</code></li>
-        <li>Deploy it to <a href="https://deno.com/deploy">Deno Deploy</a> via the CLI by running<code>deno deploy</code></li>
-        <li>Run it locally and share it publically by running <code>deno deploy --connected</code></li>
-      </ul>
-    </section>
-      <hr>
-    <section>
-      <h2>What's next?</h2>
-      <p>
-        You can clone this example and deploy it to Deno Deploy in just a few clicks
-        <a href="https://app.deno.com/new?clone=https://github.com/denoland/examples&path=hello-world"><img src="https://deno.com/button" alt="Deploy on Deno"/></a>
-      </p>
-      <ul>
-        <li>
-          <a href="https://docs.deno.com/examples">More examples in the Deno Docs</a>
-        </li>
-        <li>
-          <a href="https://deno.com/deploy">Deno Deploy Early Access</a>
-        </li>
-      </ul>
-    </section>
-    </main>
-    <hr>
-    <footer>
-      <section>
-      <ul class="flex-btwn">
-        <li>
-          <a href="https://deno.com">BlueSky</a>
-        </li>
-        <li>
-          <a href="https://deno.com">Twitter</a>
-        </li>
-        <li>
-          <a href="https://deno.com">YouTube</a>
-        </li>
-        <li>
-          <a href="https://deno.com">Newsletter</a>
-        </li>
-        <li>
-          <a href="https://deno.com">Deno</a>
-        </li>
-      </ul>
-      </section>
-    </footer>
+  <div class="container">
+    <h1>🚀 V2Ray Config Generator</h1>
+    
+    <div class="status">✅ سرور با موفقیت فعال شد</div>
+    
+    <div class="info">
+      <p><strong>🔑 UUID:</strong> ${uuid}</p>
+      <p><strong>🌐 آدرس:</strong> ${host}</p>
+      <p><strong>📡 پروتکل:</strong> VLESS + WebSocket</p>
+      <p><strong>⏰ زمان:</strong> ${new Date().toLocaleString('fa-IR')}</p>
+    </div>
+    
+    <h3 style="color: white;">📦 کانفیگ VLESS:</h3>
+    <div class="config-box" id="config">
+vless://${uuid}@${host}:443?encryption=none&security=tls&sni=${host}&fp=randomized&type=ws&host=${host}&path=%2Fvless%3Fed%3D2048#Deno-${host.split('.')[0]}
+    </div>
+    
+    <div style="text-align: center;">
+      <button class="btn" onclick="copyConfig()">📋 کپی کانفیگ</button>
+      <button class="btn btn-blue" onclick="window.open('/vless.txt')">📥 دانلود فایل</button>
+    </div>
+    
+    <div style="margin-top: 30px; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+      <h4 style="color: white;">📱 روش استفاده در V2RayNG:</h4>
+      <ol style="color: white; margin-right: 20px;">
+        <li>برنامه V2RayNG رو باز کن</li>
+        <li>روی + کلیک کن</li>
+        <li>انتخاب کن "Import Config from URL"</li>
+        <li>لینک رو وارد کن: <strong style="direction: ltr; display: block; background: #333; padding: 10px; margin-top: 10px; border-radius: 5px;">https://${host}/vless.txt</strong></li>
+      </ol>
+    </div>
+    
+    <div class="footer">
+      <p>✨ پروژه شخصی jde1etxl6w | Deno Deploy | 2026</p>
+    </div>
+  </div>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').innerText;
+      navigator.clipboard.writeText(config).then(() => {
+        alert('✅ کانفیگ کپی شد!');
+      });
+    }
+  </script>
 </body>
-</html>
+</html>`;
+}
